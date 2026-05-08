@@ -1,0 +1,56 @@
+# ══════════════════════════════════════════════════════════════════
+# LearnUp Enterprise Backend — Production Dependencies
+# ══════════════════════════════════════════════════════════════════
+
+# Core Framework
+Django>=5.0,<5.1
+djangorestframework>=3.15,<4.0
+
+# Authentication & Security
+djangorestframework-simplejwt>=5.3,<6.0
+django-cors-headers>=4.3,<5.0
+argon2-cffi>=25.1,<26.0                 # OWASP recommended password hasher
+
+# Database
+mysqlclient>=2.2,<3.0                   # Native MySQL driver (C-extension, fastest)
+
+# Environment & Configuration
+django-environ>=0.11,<1.0               # .env file loading
+
+# API Documentation
+drf-spectacular>=0.27,<1.0              # OpenAPI 3.0 / Swagger auto docs
+
+# Filtering & Pagination
+django-filter>=25.0,<26.0
+
+# File Storage (cloud-ready)
+django-storages>=1.14,<2.0             # S3, Azure, GCS adapters
+boto3>=1.34,<2.0                       # AWS S3 SDK (for production)
+
+# Background Tasks
+celery>=5.4,<6.0                       # Distributed task queue
+redis>=7.0,<8.0                        # Celery broker + caching
+
+# HTTP Client (for Ollama, GitHub, Scrapers)
+httpx>=0.27,<1.0                       # Modern async HTTP client
+
+# Web Scraping (future modules)
+beautifulsoup4>=4.12,<5.0
+requests>=2.31,<3.0
+
+# ASGI Server & WebSocket
+daphne>=4.0,<5.0                       # ASGI server (replaces gunicorn for WS)
+channels>=4.0,<5.0                     # Django Channels (WebSocket support)
+channels-redis>=4.1,<5.0               # Redis channel layer backend
+
+# Production Server (WSGI fallback)
+gunicorn>=25.0,<26.0                   # WSGI production server
+
+# Utilities
+uuid>=1.30                             # UUID generation fallback
+Pillow>=12.0,<13.0                     # Image processing
+
+# Development & Testing
+pytest>=9.0,<10.0
+pytest-django>=4.8,<5.0
+factory-boy>=3.3,<4.0                  # Test factories
