@@ -283,6 +283,9 @@ GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 # ──────────────────────────────────────────────────────────────────
 # Logging
 # ──────────────────────────────────────────────────────────────────
+# Ensure logs directory exists
+(BASE_DIR / "logs").mkdir(parents=True, exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
