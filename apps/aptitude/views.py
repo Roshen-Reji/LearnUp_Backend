@@ -102,7 +102,8 @@ class QuestionCreateView(APIView):
                 category=request.data.get("category", "coding"),
                 count=request.data.get("count", 5),
                 is_high_iq=request.data.get("is_high_iq", False),
-                target_branch=request.data.get("target_branch", "General")
+                target_branch=request.data.get("target_branch", "General"),
+                user=request.user
             )
             return Response({"success": True, "message": "5 questions generated.", "data": data}, status=201)
 

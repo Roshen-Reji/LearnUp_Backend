@@ -68,6 +68,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # ──────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",           # HSTS, SSL redirect
+    "whitenoise.middleware.WhiteNoiseMiddleware",              # Serve static files in production
     "corsheaders.middleware.CorsMiddleware",                   # CORS before CommonMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

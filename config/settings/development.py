@@ -33,3 +33,15 @@ LOGGING["loggers"]["django.db.backends"] = {  # noqa: F405
 
 # CORS: accept all origins during development
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Bypass Redis in local development so Windows users don't need a Redis server
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}

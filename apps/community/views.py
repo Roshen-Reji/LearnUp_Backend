@@ -113,18 +113,23 @@ class GlobalChatDetailView(APIView):
         return Response({"success": True})
 
 
-class NoticeListCreateView(ListCreateAPIView):
+class NoticeListCreateView(APIView):
     """GET/POST /api/v1/community/notices/"""
-    queryset = Notice.objects.all()
-    serializer_class = NoticeSerializer
     
     def get_permissions(self):
         if self.request.method == "POST":
             return [IsAuthenticated(), IsModerator()]
         return [AllowAny()]
         
-    def perform_create(self, serializer):
-        notice = serializer.save(author=self.request.user, author_name=self.request.user.name)
+    def get(self, request):
+        notices = Notice.objects.all()
+        serializer = NoticeSerializer(notices, many=True)
+        return Response({"success": True, "data": serializer.data})
+        
+    def post(self, request):
+        serializer = NoticeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        notice = serializer.save(author=request.user, author_name=request.user.name)
         
         # Broadcast notice via websocket
         from channels.layers import get_channel_layer
@@ -139,20 +144,40 @@ class NoticeListCreateView(ListCreateAPIView):
                     "notice": serializer.data
                 }
             )
+        return Response({"success": True, "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
-class FeedbackListCreateView(ListCreateAPIView):
+class NoticeDetailView(APIView):
+    """DELETE /api/v1/community/notices/<id>/"""
+    permission_classes = [IsAuthenticated, IsModerator]
+
+    def delete(self, request, pk):
+        try:
+            notice = Notice.objects.get(pk=pk)
+            notice.delete()
+            return Response({"success": True})
+        except Notice.DoesNotExist:
+            return Response({"error": "Notice not found"}, status=404)
+
+
+class FeedbackListCreateView(APIView):
     """GET/POST /api/v1/community/feedback/"""
-    queryset = Feedback.objects.all()
-    serializer_class = FeedbackSerializer
     
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsAuthenticated(), IsModerator()]
         return [IsAuthenticated()]
         
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user, user_name=self.request.user.name)
+    def get(self, request):
+        feedbacks = Feedback.objects.all()
+        serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response({"success": True, "data": serializer.data})
+        
+    def post(self, request):
+        serializer = FeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user, user_name=request.user.name)
+        return Response({"success": True, "data": serializer.data}, status=status.HTTP_201_CREATED)
 
 
 class SettingsView(APIView):
@@ -164,10 +189,22 @@ class SettingsView(APIView):
         return [AllowAny()]
         
     def get(self, request):
-        return Response({"success": True, "data": services.get_settings()})
+        settings_data = services.get_settings()
+        if "ai_api_key" in settings_data and settings_data["ai_api_key"]:
+            key = settings_data["ai_api_key"]
+            settings_data["ai_api_key"] = "*" * max(0, len(key) - 4) + key[-4:]
+        return Response({"success": True, "data": settings_data})
         
     def patch(self, request):
         settings_data = request.data.get("settings", {})
         for k, v in settings_data.items():
+            if k == "ai_api_key" and str(v).startswith("*"):
+                continue  # Don't overwrite with masked string
             services.update_setting(k, v)
-        return Response({"success": True, "data": services.get_settings()})
+            
+        updated_settings = services.get_settings()
+        if "ai_api_key" in updated_settings and updated_settings["ai_api_key"]:
+            key = updated_settings["ai_api_key"]
+            updated_settings["ai_api_key"] = "*" * max(0, len(key) - 4) + key[-4:]
+            
+        return Response({"success": True, "data": updated_settings})

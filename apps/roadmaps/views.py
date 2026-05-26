@@ -41,7 +41,7 @@ class RoadmapListCreateView(APIView):
             skill = request.data.get("skill", "General Skill")
             
             from apps.ai.services import generate_roadmap_json
-            generated_nodes = generate_roadmap_json(skill)
+            generated_nodes = generate_roadmap_json(skill, user=request.user)
             
             if generated_nodes:
                 nodes = generated_nodes

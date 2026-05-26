@@ -205,13 +205,13 @@ class MeView(APIView):
 # User Management Views
 # ══════════════════════════════════════════════════════════════════
 
-class UserListView(ListAPIView):
+class UserListView(APIView):
     """GET /api/v1/users/ — List all users (moderator only)."""
-    serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsModerator]
 
-    def get_queryset(self):
-        return User.objects.all().prefetch_related("badges")
+    def get(self, request):
+        users = User.objects.all().prefetch_related("badges")
+        return Response({"success": True, "data": UserSerializer(users, many=True).data})
 
     def post(self, request):
         """Create a new user from the moderator panel."""

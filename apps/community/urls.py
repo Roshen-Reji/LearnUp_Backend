@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     PostListCreateView, PostDetailView, PostReplyView, PostUpvoteView,
     GlobalChatListCreateView, GlobalChatDetailView,
-    NoticeListCreateView, FeedbackListCreateView, SettingsView
+    NoticeListCreateView, NoticeDetailView, FeedbackListCreateView, SettingsView
 )
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path("chat/<uuid:pk>/", GlobalChatDetailView.as_view(), name="chat-detail"),
     
     path("notices/", NoticeListCreateView.as_view(), name="notice-list-create"),
+    path("notices/<uuid:pk>/", NoticeDetailView.as_view(), name="notice-detail"),
     path("feedback/", FeedbackListCreateView.as_view(), name="feedback-list-create"),
     path("settings/", SettingsView.as_view(), name="settings"),
 ]

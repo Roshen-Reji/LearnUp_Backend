@@ -47,9 +47,11 @@ class GlobalChatSerializer(serializers.ModelSerializer):
 
 
 class NoticeSerializer(serializers.ModelSerializer):
+    imageUrl = serializers.URLField(source='image_url', required=False, allow_blank=True)
+
     class Meta:
         model = Notice
-        fields = "__all__"
+        fields = ["id", "title", "body", "imageUrl", "image_url", "author", "author_name", "pinned", "form_url", "created_at", "updated_at"]
         read_only_fields = ["id", "author", "author_name", "created_at", "updated_at"]
 
 

@@ -1,15 +1,15 @@
-from services.ollama import ollama
+
 import json
 import logging
 from .models import Question
 
 logger = logging.getLogger("apps.aptitude")
 
-def generate_custom_questions(topic, category, count, is_high_iq, target_branch):
+def generate_custom_questions(topic, category, count, is_high_iq, target_branch, user=None):
     """Generate generic custom questions."""
     try:
-        from apps.ai.services import generate_aptitude_json
-        data = generate_aptitude_json(topic, count, is_high_iq, target_branch)
+        from apps.ai.services import generate_aptitude_json_compat
+        data = generate_aptitude_json_compat(topic, count, is_high_iq, target_branch, user=user)
         if not data:
             raise Exception("AI Returned No Generative JSON Data.")
         
@@ -36,21 +36,7 @@ def generate_custom_questions(topic, category, count, is_high_iq, target_branch)
         return created
     except Exception as e:
         logger.error(f"AI Generation failed: {e}")
-        # Fallback pseudo-generation
-        for i in range(count):
-            Question.objects.create(
-                text=f"AI Generated {topic} Question {i+1}",
-                options=["A", "B", "C", "D"],
-                correct_index=0,
-                explanation="AI Placeholder",
-                category="coding" if is_high_iq else category,
-                difficulty="hard",
-                is_high_iq=is_high_iq,
-                target_branch=target_branch,
-                approved=False,
-                ai_generated=True
-            )
-        return [{"id": "new", "text": "Mock Generated", "options": []}]
+        raise Exception(f"AI Generation failed: {e}")
 
 def generate_daily_questions():
     """Generates 9 questions automatically."""
